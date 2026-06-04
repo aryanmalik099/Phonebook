@@ -59,7 +59,7 @@ def search_contact(target_name):
         reader = csv.reader(file)
 
         for row in reader:
-            if target_name.lower() in row[0].lower() or target_name.lower() in row[1].lower():
+            if row[0].lower().startswith(target_name.lower()) or row[0].split()[1].lower().startswith(target_name.lower()) or row[1].lower().startswith(target_name.lower()):
                 print(f"Name: {row[0]}, Number: {row[1]}")
 
 def delete_contact(target_name):
