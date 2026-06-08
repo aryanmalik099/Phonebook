@@ -1,9 +1,26 @@
 import csv
 
+
 FILENAME = "phonebook.csv"
 
 def add_contact(name, number):
     try:
+        existing = []
+        try:
+            with open(FILENAME, "r") as file:
+                existing = list(csv.reader(file))
+        except FileNotFoundError:
+            existing = []
+
+        for row in existing:
+            if len(row) >= 2:
+                if row[0].strip().lower() == name.strip().lower():
+                    print("A contact with that name already exists. Add aborted.")
+                    return
+                if row[1].strip() == number.strip():
+                    print("A contact with that number already exists. Add aborted.")
+                    return
+
         with open(FILENAME, "a", newline="") as file:
             writer = csv.writer(file)
             writer.writerow([name, number])
@@ -78,12 +95,22 @@ def delete_contact(target_name):
     try:
         with open(FILENAME, "r") as file:
             rows = list(csv.reader(file))
-
-        new_rows = [row for row in rows if row and row[0].lower() != target_name.lower()]
-
-        if len(new_rows) == len(rows):
+        to_delete = [row for row in rows if row and row[0].lower() == target_name.lower()]
+        if not to_delete:
             print("Contact not found.")
             return
+
+        print("The following contact(s) will be deleted:")
+        for row in to_delete:
+            if len(row) >= 2:
+                print(f"- Name: {row[0]}, Number: {row[1]}")
+
+        confirm = input("Are you sure you want to delete these contact(s)? (y/n): ")
+        if confirm.strip().lower() != 'y':
+            print("Delete canceled.")
+            return
+
+        new_rows = [row for row in rows if not (row and row[0].lower() == target_name.lower())]
 
         with open(FILENAME, "w", newline="") as file:
             writer = csv.writer(file)
